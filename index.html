@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Gunter · Facturas">
+<meta name="theme-color" content="#1a1a2e">
+<title>Gunter · Facturas</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Bricolage+Grotesque:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f3ef;
+  --surface: #ffffff;
+  --surface2: #edeae4;
+  --border: #ddd9d0;
+  --accent: #1a1a2e;
+  --accent2: #2d2d4e;
+  --accent-light: #e8e8f8;
+  --text: #1a1a18;
+  --muted: #7a7570;
+  --danger: #c0392b;
+  --pending: #b7791f;
+  --pending-bg: #fef3c7;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  min-height: 100vh;
+}
+
+header {
+  background: var(--accent);
+  color: white;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; }
+.logo span { opacity: 0.5; font-weight: 400; margin: 0 6px; }
+.logo .sub { font-size: 12px; font-weight: 400; opacity: 0.6; display: block; margin-top: 1px; font-family: 'DM Mono', monospace; }
+
+.header-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  background: rgba(255,255,255,0.15);
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+
+.nav {
+  display: flex;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+}
+
+.nav-btn {
+  padding: 14px 20px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.nav-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+main { max-width: 860px; margin: 0 auto; padding: 24px; }
+
+.view { display: none; }
+.view.active { display: block; }
+
+.section-title {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  color: var(--text);
+}
+
+/* STATS */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  font-family: 'DM Mono', monospace;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.stat-value.big {
+  font-size: 15px;
+}
+
+/* FORM */
+.form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  margin-bottom: 24px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field.full { grid-column: 1 / -1; }
+
+label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--muted);
+}
+
+input[type="text"], input[type="date"], input[type="number"], select, textarea {
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 15px;
+  color: var(--text);
+  background: var(--surface);
+  transition: border-color 0.2s;
+  width: 100%;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.radio-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.radio-opt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--surface);
+}
+
+.radio-opt:has(input:checked) {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.radio-opt input { display: none; }
+.radio-opt label { cursor: pointer; font-size: 14px; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--text); margin: 0; }
+
+/* PHOTO */
+.photo-area {
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--bg);
+  position: relative;
+}
+
+.photo-area:hover { border-color: var(--accent); background: var(--accent-light); }
+.photo-area.has-photo { border-style: solid; border-color: var(--accent); }
+
+.photo-preview {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 8px;
+  display: none;
+}
+
+.photo-area.has-photo .photo-preview { display: block; margin: 0 auto 12px; }
+.photo-area.has-photo .photo-placeholder { display: none; }
+
+.photo-placeholder { color: var(--muted); }
+.photo-placeholder .icon { font-size: 32px; margin-bottom: 8px; }
+.photo-placeholder p { font-size: 14px; }
+.photo-placeholder small { font-size: 12px; opacity: 0.7; }
+
+.ai-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--accent);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+
+.ai-loading {
+  display: none;
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 8px;
+  font-style: italic;
+}
+
+/* FIELD LABEL ANIMATION */
+.field-label-hint {
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.field-label-hint.show { opacity: 1; }
+
+/* AUTOCOMPLETE */
+.autocomplete-wrap { position: relative; }
+#autocompleteList {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1.5px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 50;
+  display: none;
+  box-shadow: var(--shadow);
+}
+.autocomplete-item {
+  padding: 10px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.autocomplete-item:hover { background: var(--accent-light); }
+.autocomplete-item small { display: block; font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+/* MONTO DISPLAY */
+.monto-display {
+  font-family: 'DM Mono', monospace;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--accent);
+  margin-top: 4px;
+  display: none;
+}
+.monto-display.show { display: block; }
+
+/* BUTTONS */
+.btn-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex: 1;
+  min-width: 120px;
+}
+
+.btn-primary { background: var(--accent); color: white; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-secondary { background: var(--surface2); color: var(--text); }
+.btn-secondary:hover { background: var(--border); }
+
+/* TABLE */
+.table-toolbar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 180px;
+  padding: 9px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: 'Bricolage Grotesque', sans-serif;
+}
+
+.filter-select {
+  padding: 9px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  background: white;
+}
+
+.btn-sm {
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  transition: all 0.2s;
+}
+
+.btn-sm-outline {
+  background: white;
+  border: 1.5px solid var(--border);
+  color: var(--text);
+}
+.btn-sm-outline:hover { border-color: var(--accent); }
+
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead { background: var(--surface2); }
+th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+td {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  vertical-align: middle;
+}
+tr:hover td { background: var(--bg); }
+
+.td-monto {
+  font-family: 'DM Mono', monospace;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.cat-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--accent-light);
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+/* Category color coding */
+.cat-super { background: #e8f5e9; color: #2e7d32; }
+.cat-farmacia { background: #fce4ec; color: #c62828; }
+.cat-servicios { background: #e3f2fd; color: #1565c0; }
+.cat-combustible { background: #fff3e0; color: #e65100; }
+.cat-restaurante { background: #f3e5f5; color: #6a1b9a; }
+.cat-educacion { background: #e8eaf6; color: #283593; }
+.cat-vestimenta { background: #fafafa; color: #424242; }
+.cat-otros { background: var(--surface2); color: var(--muted); }
+
+.td-proveedor { max-width: 180px; }
+.td-proveedor span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.photo-thumb {
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+}
+
+.empty {
+  text-align: center;
+  padding: 60px 24px;
+  color: var(--muted);
+}
+.empty .empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty h3 { font-size: 18px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+.empty p { font-size: 14px; }
+
+/* MODAL */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: white;
+  border-radius: 16px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.modal-header {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+.modal-title { font-weight: 700; font-size: 15px; }
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 0 4px;
+}
+.modal img { max-width: 85vw; max-height: 80vh; display: block; }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--accent);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 300;
+  transition: transform 0.3s ease;
+  white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* RESUMEN POR CATEGORIA */
+.cat-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.cat-summary-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cat-summary-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.cat-summary-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+@media (max-width: 600px) {
+  main { padding: 16px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .field.full { grid-column: 1; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  th:nth-child(n+5) { display: none; }
+  td:nth-child(n+5) { display: none; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">Gunter Nemetz <span>·</span> Facturas</div>
+    <span class="logo sub">registro personal de gastos</span>
+  </div>
+  <div class="header-badge">PRIVADO</div>
+</header>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="showView('nueva')">Nueva</button>
+  <button class="nav-btn" onclick="showView('lista')">Lista</button>
+  <button class="nav-btn" onclick="showView('resumen')">Resumen</button>
+</nav>
+
+<main>
+
+  <!-- NUEVA FACTURA -->
+  <div class="view active" id="view-nueva">
+    <div class="section-title">Registrar factura</div>
+
+    <div class="form-card">
+      <!-- FOTO -->
+      <div class="field full" style="margin-bottom: 20px;">
+        <label>Foto de la factura <span style="font-weight:400;text-transform:none;color:var(--accent)">(lectura automática con IA)</span></label>
+        <div class="photo-area" id="photoArea" onclick="document.getElementById('photoInput').click()">
+          <span class="ai-badge">IA</span>
+          <img id="photoPreview" class="photo-preview" src="" alt="">
+          <div class="photo-placeholder">
+            <div class="icon">📷</div>
+            <p>Tocá para sacar o subir una foto</p>
+            <small>La IA va a completar los campos automáticamente</small>
+          </div>
+        </div>
+        <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(event)">
+        <div class="ai-loading" id="aiLoading">🤖 Leyendo factura...</div>
+      </div>
+
+      <div class="form-grid">
+
+        <div class="field">
+          <label>Fecha</label>
+          <input type="date" id="fecha">
+        </div>
+
+        <div class="field">
+          <label>Monto Total (₲)</label>
+          <input type="number" id="monto" placeholder="0" oninput="updateMontoDisplay()">
+          <div class="monto-display" id="montoDisplay"></div>
+          <span class="field-label-hint" id="montoLabel">✓ leído por IA</span>
+        </div>
+
+        <div class="field full autocomplete-wrap">
+          <label>Proveedor / Comercio</label>
+          <input type="text" id="proveedor" placeholder="Nombre del comercio o emisor" autocomplete="off" oninput="handleProveedorInput(this.value)">
+          <div id="autocompleteList"></div>
+          <span class="field-label-hint" id="provLabel">✓ leído por IA</span>
+        </div>
+
+        <div class="field">
+          <label>N° Factura</label>
+          <input type="text" id="nroFactura" placeholder="000-000-0000000">
+          <span class="field-label-hint" id="nroLabel">✓ leído por IA</span>
+        </div>
+
+        <div class="field">
+          <label>Timbrado</label>
+          <input type="text" id="timbrado" placeholder="Número de timbrado">
+          <span class="field-label-hint" id="timbLabel">✓ leído por IA</span>
+        </div>
+
+        <div class="field full">
+          <label>Categoría</label>
+          <select id="categoria" onchange="updateCatClass()">
+            <option value="">— Seleccioná una categoría —</option>
+            <option value="super-alimentos">🛒 Supermercado — Alimentos</option>
+            <option value="super-limpieza">🧹 Supermercado — Limpieza / Hogar</option>
+            <option value="super-otros">🛍 Supermercado — Otros</option>
+            <option value="farmacia">💊 Farmacia / Salud</option>
+            <option value="servicios">💡 Servicios (luz, agua, gas, internet)</option>
+            <option value="combustible">⛽ Combustible</option>
+            <option value="restaurante">🍽 Restaurantes / Comidas fuera</option>
+            <option value="educacion">📚 Educación</option>
+            <option value="vestimenta">👗 Vestimenta</option>
+            <option value="otros">📋 Otros</option>
+          </select>
+        </div>
+
+        <div class="field full">
+          <label>Tipo de Pago</label>
+          <div class="radio-group">
+            <div class="radio-opt"><input type="radio" name="tipoPago" id="contado" value="Contado" checked><label for="contado">Contado</label></div>
+            <div class="radio-opt"><input type="radio" name="tipoPago" id="credito" value="Crédito"><label for="credito">Crédito</label></div>
+            <div class="radio-opt"><input type="radio" name="tipoPago" id="tarjeta" value="Tarjeta"><label for="tarjeta">Tarjeta</label></div>
+          </div>
+        </div>
+
+        <div class="field full">
+          <label>Tipo de Factura</label>
+          <div class="radio-group">
+            <div class="radio-opt"><input type="radio" name="tipoFactura" id="electronica" value="Electrónica" checked><label for="electronica">Electrónica</label></div>
+            <div class="radio-opt"><input type="radio" name="tipoFactura" id="fisica" value="Física"><label for="fisica">Física</label></div>
+          </div>
+        </div>
+
+        <div class="field full">
+          <label>IVA</label>
+          <div class="radio-group">
+            <div class="radio-opt"><input type="radio" name="iva" id="iva10" value="10%" checked><label for="iva10">10%</label></div>
+            <div class="radio-opt"><input type="radio" name="iva" id="iva5" value="5%"><label for="iva5">5%</label></div>
+            <div class="radio-opt"><input type="radio" name="iva" id="ivaExento" value="Exento"><label for="ivaExento">Exento</label></div>
+            <div class="radio-opt"><input type="radio" name="iva" id="ivaMix" value="Mixto"><label for="ivaMix">Mixto</label></div>
+          </div>
+        </div>
+
+        <div class="field full">
+          <label>Observaciones</label>
+          <textarea id="observaciones" rows="2" placeholder="Detalle opcional..."></textarea>
+        </div>
+
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="resetForm()">Limpiar</button>
+        <button class="btn btn-primary" onclick="guardarFactura()">Guardar factura</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LISTA -->
+  <div class="view" id="view-lista">
+    <div class="section-title">Facturas registradas</div>
+
+    <div class="table-toolbar">
+      <input type="text" class="search-input" id="searchInput" placeholder="Buscar proveedor..." oninput="renderTabla()">
+      <select class="filter-select" id="filterCat" onchange="renderTabla()">
+        <option value="">Todas las categorías</option>
+        <option value="super-alimentos">Supermercado — Alimentos</option>
+        <option value="super-limpieza">Supermercado — Limpieza</option>
+        <option value="super-otros">Supermercado — Otros</option>
+        <option value="farmacia">Farmacia / Salud</option>
+        <option value="servicios">Servicios</option>
+        <option value="combustible">Combustible</option>
+        <option value="restaurante">Restaurantes</option>
+        <option value="educacion">Educación</option>
+        <option value="vestimenta">Vestimenta</option>
+        <option value="otros">Otros</option>
+      </select>
+      <button class="btn-sm btn-sm-outline" onclick="exportarExcel()">↓ Excel</button>
+    </div>
+
+    <div class="table-wrap">
+      <table id="tablaFacturas">
+        <thead>
+          <tr>
+            <th>Foto</th>
+            <th>Fecha</th>
+            <th>Proveedor</th>
+            <th>Categoría</th>
+            <th>Monto</th>
+            <th>IVA</th>
+            <th>Pago</th>
+          </tr>
+        </thead>
+        <tbody id="tablaBody"></tbody>
+      </table>
+      <div class="empty" id="emptyState" style="display:none;">
+        <div class="empty-icon">🗂</div>
+        <h3>Sin facturas aún</h3>
+        <p>Empezá registrando tu primera factura desde Nueva.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESUMEN -->
+  <div class="view" id="view-resumen">
+    <div class="section-title">Resumen de gastos</div>
+
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card">
+        <div class="stat-label">Total registrado</div>
+        <div class="stat-value big" id="statTotal">₲ 0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Facturas</div>
+        <div class="stat-value" id="statCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Este mes</div>
+        <div class="stat-value big" id="statMes">₲ 0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Promedio factura</div>
+        <div class="stat-value big" id="statPromedio">₲ 0</div>
+      </div>
+    </div>
+
+    <div class="section-title" style="font-size:16px; margin-bottom:14px;">Por categoría</div>
+    <div class="cat-summary-grid" id="catSummaryGrid"></div>
+  </div>
+
+</main>
+
+<!-- MODAL FOTO -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Factura</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <img id="modalImg" src="" alt="">
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── CATEGORÍAS ───────────────────────────────────────────
+const CATEGORIAS = {
+  'super-alimentos': { label: 'Supermercado — Alimentos', css: 'cat-super' },
+  'super-limpieza':  { label: 'Supermercado — Limpieza / Hogar', css: 'cat-super' },
+  'super-otros':     { label: 'Supermercado — Otros', css: 'cat-super' },
+  'farmacia':        { label: 'Farmacia / Salud', css: 'cat-farmacia' },
+  'servicios':       { label: 'Servicios', css: 'cat-servicios' },
+  'combustible':     { label: 'Combustible', css: 'cat-combustible' },
+  'restaurante':     { label: 'Restaurantes', css: 'cat-restaurante' },
+  'educacion':       { label: 'Educación', css: 'cat-educacion' },
+  'vestimenta':      { label: 'Vestimenta', css: 'cat-vestimenta' },
+  'otros':           { label: 'Otros', css: 'cat-otros' }
+};
+
+// Mapeo de proveedores conocidos → categoría sugerida
+const PROV_MAP = {
+  'SUPERSEIS':              'super-alimentos',
+  'STOCK':                  'super-alimentos',
+  'BIGGIE':                 'super-limpieza',
+  'NUEVA AMERICANA':        'super-limpieza',
+  'AMANCAY':                'super-limpieza',
+  'FARMA':                  'farmacia',
+  'FARMACENTER':            'farmacia',
+  'BUEN PRECIO':            'super-alimentos',
+  'VILLA MORRA':            'super-alimentos',
+  'LA HERENCIA':            'super-alimentos',
+  'REAL':                   'super-alimentos',
+  'ANDE':                   'servicios',
+  'ESSAP':                  'servicios',
+  'COPACO':                 'servicios',
+  'TIGO':                   'servicios',
+  'PERSONAL':               'servicios',
+  'CLARO':                  'servicios',
+  'NUCLEO':                 'servicios',
+  'BEX':                    'combustible',
+  'ESTACION':               'combustible',
+  'COMBU':                  'combustible',
+  'NONUS':                  'combustible',
+};
+
+// ─── CONFIG ──────────────────────────────────────────────
+// IMPORTANTE: Reemplazá con la URL del Google Apps Script de Günther
+const SHEETS_URL = 'PENDIENTE_URL_SHEETS_GUNTHER';
+
+// ─── STATE ───────────────────────────────────────────────
+let facturas = JSON.parse(localStorage.getItem('gunther_facturas_v1') || '[]');
+let photoData = null;
+
+// ─── INIT ────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const hoy = new Date().toISOString().split('T')[0];
+  document.getElementById('fecha').value = hoy;
+  renderTabla();
+  renderStats();
+  renderCatSummary();
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.autocomplete-wrap')) {
+      document.getElementById('autocompleteList').style.display = 'none';
+    }
+  });
+});
+
+// ─── NAVEGACIÓN ──────────────────────────────────────────
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  event.target.classList.add('active');
+  if (name === 'lista') renderTabla();
+  if (name === 'resumen') { renderStats(); renderCatSummary(); }
+}
+
+// ─── FOTO Y AI ───────────────────────────────────────────
+function handlePhoto(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const dataUrl = e.target.result;
+    document.getElementById('photoPreview').src = dataUrl;
+    document.getElementById('photoArea').classList.add('has-photo');
+
+    const base64 = dataUrl.split(',')[1];
+    const mediaType = file.type;
+    photoData = { base64, mediaType, dataUrl };
+
+    document.getElementById('aiLoading').style.display = 'block';
+    const data = await readInvoiceWithAI(base64, mediaType);
+    document.getElementById('aiLoading').style.display = 'none';
+
+    if (data) fillFieldsFromAI(data);
+  };
+  reader.readAsDataURL(file);
+}
+
+async function readInvoiceWithAI(base64, mediaType) {
+  try {
+    const response = await fetch('https://ofitronic-facturas.up.railway.app/leer-factura', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: base64, mediaType })
+    });
+    const data = await response.json();
+    if (!data.ok) { showToast('⚠ No se pudo leer la factura — completá manualmente'); return null; }
+    return data.data;
+  } catch (err) {
+    showToast('⚠ Error de conexión — completá manualmente');
+    return null;
+  }
+}
+
+function fillFieldsFromAI(data) {
+  if (data.fecha) {
+    document.getElementById('fecha').value = data.fecha;
+    setFieldAI('fecha', data.fecha);
+  }
+  if (data.proveedor) {
+    document.getElementById('proveedor').value = data.proveedor;
+    document.getElementById('provLabel').classList.add('show');
+    // Sugerir categoría según proveedor
+    suggestCategoryFromProvider(data.proveedor);
+  }
+  if (data.nroFactura) {
+    document.getElementById('nroFactura').value = data.nroFactura;
+    document.getElementById('nroLabel').classList.add('show');
+  }
+  if (data.timbrado) {
+    document.getElementById('timbrado').value = data.timbrado;
+    document.getElementById('timbLabel').classList.add('show');
+  }
+  if (data.monto) {
+    document.getElementById('monto').value = data.monto;
+    document.getElementById('montoDisplay').textContent = '₲ ' + parseInt(data.monto).toLocaleString('es-PY');
+    document.getElementById('montoDisplay').classList.add('show');
+    document.getElementById('montoLabel').classList.add('show');
+  }
+  if (data.tipoPago) {
+    document.querySelectorAll('input[name="tipoPago"]').forEach(r => r.checked = r.value === data.tipoPago);
+  }
+  if (data.tipoFactura) {
+    document.querySelectorAll('input[name="tipoFactura"]').forEach(r => r.checked = r.value === data.tipoFactura);
+  }
+  if (data.iva) {
+    document.querySelectorAll('input[name="iva"]').forEach(r => r.checked = r.value === data.iva);
+  }
+  showToast('✓ Factura leída — revisá los campos');
+}
+
+function suggestCategoryFromProvider(prov) {
+  const upper = prov.toUpperCase();
+  for (const [key, cat] of Object.entries(PROV_MAP)) {
+    if (upper.includes(key)) {
+      document.getElementById('categoria').value = cat;
+      return;
+    }
+  }
+}
+
+function setFieldAI(id, val) {
+  document.getElementById(id).value = val;
+}
+
+// ─── AUTOCOMPLETE ─────────────────────────────────────────
+function handleProveedorInput(val) {
+  const list = document.getElementById('autocompleteList');
+  if (val.length < 2) { list.style.display = 'none'; return; }
+
+  // Buscar entre proveedores ya registrados
+  const proveedoresUsados = [...new Set(facturas.map(f => f.proveedor).filter(Boolean))];
+  const matches = proveedoresUsados.filter(p => p.toLowerCase().includes(val.toLowerCase())).slice(0, 6);
+
+  if (!matches.length) { list.style.display = 'none'; return; }
+
+  list.innerHTML = matches.map(p => `<div class="autocomplete-item" onclick="selectProveedor('${p.replace(/'/g,"\\'")}')">
+    ${p}
+  </div>`).join('');
+  list.style.display = 'block';
+}
+
+function selectProveedor(prov) {
+  document.getElementById('proveedor').value = prov;
+  document.getElementById('autocompleteList').style.display = 'none';
+  suggestCategoryFromProvider(prov);
+}
+
+// ─── MONTO ───────────────────────────────────────────────
+function updateMontoDisplay() {
+  const val = document.getElementById('monto').value;
+  const display = document.getElementById('montoDisplay');
+  if (val && parseInt(val) > 0) {
+    display.textContent = '₲ ' + parseInt(val).toLocaleString('es-PY');
+    display.classList.add('show');
+  } else {
+    display.classList.remove('show');
+  }
+}
+
+function updateCatClass() {}
+
+// ─── GUARDAR ─────────────────────────────────────────────
+function guardarFactura() {
+  const fecha = document.getElementById('fecha').value;
+  const proveedor = document.getElementById('proveedor').value.trim();
+  const nroFactura = document.getElementById('nroFactura').value.trim();
+  const monto = document.getElementById('monto').value;
+  const categoria = document.getElementById('categoria').value;
+
+  if (!fecha) { showToast('⚠ Completá la fecha'); return; }
+  if (!proveedor) { showToast('⚠ Completá el proveedor'); return; }
+  if (!monto || parseInt(monto) <= 0) { showToast('⚠ Completá el monto'); return; }
+
+  // Check duplicado
+  const duplicado = facturas.find(f =>
+    f.nroFactura && nroFactura &&
+    f.nroFactura === nroFactura &&
+    f.proveedor.toLowerCase() === proveedor.toLowerCase()
+  );
+  if (duplicado) {
+    if (!confirm('⚠️ Ya existe una factura del mismo proveedor con ese número (' + nroFactura + ')\n\n¿Querés guardarla igual?')) {
+      return;
+    }
+  }
+
+  const tipoPago = document.querySelector('input[name="tipoPago"]:checked').value;
+  const tipoFactura = document.querySelector('input[name="tipoFactura"]:checked').value;
+  const iva = document.querySelector('input[name="iva"]:checked').value;
+
+  const catInfo = CATEGORIAS[categoria] || { label: 'Sin categorizar', css: 'cat-otros' };
+
+  const factura = {
+    id: 'GN-' + Date.now(),
+    fecha, proveedor, nroFactura,
+    timbrado: document.getElementById('timbrado').value.trim(),
+    tipoPago, tipoFactura,
+    monto: parseInt(monto),
+    iva,
+    categoria,
+    categoriaNombre: catInfo.label,
+    observaciones: document.getElementById('observaciones').value.trim(),
+    foto: photoData ? photoData.dataUrl : null,
+    registrado: new Date().toISOString()
+  };
+
+  facturas.unshift(factura);
+  localStorage.setItem('gunther_facturas_v1', JSON.stringify(facturas));
+  resetForm();
+  showToast('✓ Factura guardada · Enviando a Google Sheets...');
+  enviarASheets(factura);
+}
+
+async function enviarASheets(factura) {
+  if (SHEETS_URL === 'PENDIENTE_URL_SHEETS_GUNTHER') {
+    setTimeout(() => showToast('⚠ Configurá Google Sheets para sincronizar'), 1500);
+    return;
+  }
+  try {
+    const datos = {
+      id: factura.id,
+      fecha: factura.fecha,
+      proveedor: factura.proveedor,
+      nroFactura: factura.nroFactura,
+      timbrado: factura.timbrado,
+      tipoPago: factura.tipoPago,
+      tipoFactura: factura.tipoFactura,
+      monto: factura.monto,
+      iva: factura.iva,
+      categoria: factura.categoria,
+      categoriaNombre: factura.categoriaNombre,
+      observaciones: factura.observaciones
+    };
+    await fetch(SHEETS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos)
+    });
+    setTimeout(() => showToast('✓ Sincronizado con Google Sheets'), 1500);
+  } catch(err) {
+    setTimeout(() => showToast('⚠ Sin conexión — solo guardado localmente'), 1500);
+  }
+}
+
+// ─── RESET ───────────────────────────────────────────────
+function resetForm() {
+  document.getElementById('proveedor').value = '';
+  document.getElementById('nroFactura').value = '';
+  document.getElementById('timbrado').value = '';
+  document.getElementById('monto').value = '';
+  document.getElementById('observaciones').value = '';
+  document.getElementById('categoria').value = '';
+  document.getElementById('montoDisplay').classList.remove('show');
+  document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+  document.querySelectorAll('input[name="tipoPago"]')[0].checked = true;
+  document.querySelectorAll('input[name="tipoFactura"]')[0].checked = true;
+  document.querySelectorAll('input[name="iva"]')[0].checked = true;
+  document.querySelectorAll('.field-label-hint').forEach(el => el.classList.remove('show'));
+  document.getElementById('photoPreview').src = '';
+  document.getElementById('photoArea').classList.remove('has-photo');
+  document.getElementById('photoInput').value = '';
+  photoData = null;
+}
+
+// ─── RENDER TABLA ─────────────────────────────────────────
+function renderTabla() {
+  const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
+  const filterCat = document.getElementById('filterCat')?.value || '';
+
+  let filtered = facturas.filter(f => {
+    const matchSearch = !search || f.proveedor?.toLowerCase().includes(search) || f.observaciones?.toLowerCase().includes(search);
+    const matchCat = !filterCat || f.categoria === filterCat;
+    return matchSearch && matchCat;
+  });
+
+  const tbody = document.getElementById('tablaBody');
+  const empty = document.getElementById('emptyState');
+
+  if (!filtered.length) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = filtered.map(f => {
+    const catInfo = CATEGORIAS[f.categoria] || { label: f.categoriaNombre || '—', css: 'cat-otros' };
+    const fotoHtml = f.foto
+      ? `<img src="${f.foto}" class="photo-thumb" onclick="openModal('${f.id}')">`
+      : `<span style="color:var(--muted);font-size:18px">—</span>`;
+    return `<tr>
+      <td>${fotoHtml}</td>
+      <td><span style="font-family:'DM Mono',monospace;font-size:12px">${f.fecha}</span></td>
+      <td class="td-proveedor"><span title="${f.proveedor}">${f.proveedor}</span></td>
+      <td><span class="cat-badge ${catInfo.css}">${catInfo.label}</span></td>
+      <td class="td-monto">₲ ${f.monto?.toLocaleString('es-PY') || '—'}</td>
+      <td><span style="font-size:12px;color:var(--muted)">${f.iva || '—'}</span></td>
+      <td><span style="font-size:12px">${f.tipoPago || '—'}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── RENDER STATS ─────────────────────────────────────────
+function renderStats() {
+  const total = facturas.reduce((s, f) => s + (f.monto || 0), 0);
+  const hoy = new Date();
+  const mesActual = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}`;
+  const totalMes = facturas.filter(f => f.fecha?.startsWith(mesActual)).reduce((s, f) => s + (f.monto || 0), 0);
+  const promedio = facturas.length ? Math.round(total / facturas.length) : 0;
+
+  document.getElementById('statTotal').textContent = '₲ ' + total.toLocaleString('es-PY');
+  document.getElementById('statCount').textContent = facturas.length;
+  document.getElementById('statMes').textContent = '₲ ' + totalMes.toLocaleString('es-PY');
+  document.getElementById('statPromedio').textContent = '₲ ' + promedio.toLocaleString('es-PY');
+}
+
+// ─── RESUMEN POR CATEGORÍA ────────────────────────────────
+function renderCatSummary() {
+  const totalesCat = {};
+  facturas.forEach(f => {
+    const cat = f.categoria || 'otros';
+    totalesCat[cat] = (totalesCat[cat] || 0) + (f.monto || 0);
+  });
+
+  const sorted = Object.entries(totalesCat).sort((a, b) => b[1] - a[1]);
+  const grid = document.getElementById('catSummaryGrid');
+
+  if (!sorted.length) {
+    grid.innerHTML = '<p style="color:var(--muted);font-size:14px">Sin datos aún.</p>';
+    return;
+  }
+
+  grid.innerHTML = sorted.map(([cat, total]) => {
+    const info = CATEGORIAS[cat] || { label: cat, css: 'cat-otros' };
+    return `<div class="cat-summary-card">
+      <span class="cat-summary-name">${info.label}</span>
+      <span class="cat-summary-val">₲ ${total.toLocaleString('es-PY')}</span>
+    </div>`;
+  }).join('');
+}
+
+// ─── MODAL FOTO ───────────────────────────────────────────
+function openModal(id) {
+  const f = facturas.find(f => f.id === id);
+  if (!f?.foto) return;
+  document.getElementById('modalImg').src = f.foto;
+  document.getElementById('modalTitle').textContent = f.proveedor || 'Factura';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modalOverlay') || e.target.classList.contains('modal-close')) {
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+}
+
+// ─── EXPORT ──────────────────────────────────────────────
+function exportarExcel() {
+  if (!facturas.length) { showToast('No hay facturas para exportar'); return; }
+  const headers = ['ID','Fecha','Proveedor','N° Factura','Timbrado','Tipo Pago','Tipo Factura','Monto','IVA','Categoría','Observaciones','Registrado'];
+  const rows = facturas.map(f => [
+    f.id, f.fecha, f.proveedor, f.nroFactura||'',
+    f.timbrado||'', f.tipoPago, f.tipoFactura,
+    f.monto, f.iva,
+    f.categoriaNombre||'Sin categorizar',
+    f.observaciones||'', f.registrado||''
+  ]);
+
+  let csv = [headers, ...rows].map(row =>
+    row.map(cell => `"${String(cell||'').replace(/"/g,'""')}"`).join(',')
+  ).join('\n');
+
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `gunther-facturas-${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ─── TOAST ───────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
